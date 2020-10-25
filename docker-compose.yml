@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+
+  web:
+    build:
+      context: ./web
+    container_name: pmaweb
+    depends_on:
+      - db
+    ports:
+      - "8000:8080"
+    command: sh -c '/usr/bin/wait-for pmadb:3306 --timeout=300 -- /usr/bin/runserver.sh'
+
+  db:
+    image: mariadb:latest
+    container_name: pmadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - "12000:3306"
+    volumes:
+      - ./db/sql:/docker-entrypoint-initdb.d
+
+volumes:
+  sql:
+
+networks:
+  default:
+    external:
+      name: pmawebsite
